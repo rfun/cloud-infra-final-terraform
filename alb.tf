@@ -14,6 +14,7 @@ resource "aws_alb" "web_lb" {
   name            = "web-load-balancer"
   subnets         = [aws_subnet.us-west-2a-public.id, aws_subnet.us-west-2b-public.id]
   security_groups = [aws_security_group.web_elb_sg.id]
+  internal        = false
 }
 
 resource "aws_alb_target_group" "web" {
@@ -48,6 +49,7 @@ resource "aws_alb" "app_lb" {
   name            = "app-load-balancer"
   subnets         = [aws_subnet.us-west-2b-private-app.id, aws_subnet.us-west-2a-private-app.id]
   security_groups = [aws_security_group.app_elb_sg.id]
+  internal        = true
 }
 
 resource "aws_alb_target_group" "app" {

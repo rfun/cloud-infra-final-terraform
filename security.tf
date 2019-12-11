@@ -1,6 +1,4 @@
 # security.tf
-
-
 /*
   NAT Instance
 */
@@ -151,18 +149,48 @@ resource "aws_security_group" "app_layer_security_group" {
     cidr_blocks = ["${var.app_private_subnet_az_a_cidr}", "${var.app_private_subnet_az_b_cidr}"]
   }
 
-  # TODO : Define the database ports here
-  # egress {
-  #   from_port   = var.app_tier_port
-  #   to_port     = var.app_tier_port
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["${var.app_private_subnet_az_a_cidr}", "${var.app_private_subnet_az_b_cidr}"]
-  # }
+  egress {
+    from_port   = var.db_tier_port
+    to_port     = var.db_tier_port
+    protocol    = "tcp"
+    cidr_blocks = ["${var.db_private_subnet_az_a_cidr}", "${var.db_private_subnet_az_a_cidr}"]
+  }
 
 
   vpc_id = "${aws_vpc.test-vpc-for-final.id}"
 
   tags = {
     Name = "app_layer_security_group"
+  }
+}
+
+
+/*
+  DB Layer Security Group
+*/
+resource "aws_security_group" "db_layer_security_group" {
+  name        = "db_layer_sg"
+  description = "Allow communication between the app layer and the database layer"
+
+  ingress {
+    from_port   = var.db_tier_port
+    to_port     = var.db_tier_port
+    protocol    = "tcp"
+    cidr_blocks = ["${var.app_private_subnet_az_a_cidr}", "${var.app_private_subnet_az_b_cidr}"]
+  }
+
+
+  egress {
+    from_port   = var.db_tier_port
+    to_port     = var.db_tier_port
+    protocol    = "tcp"
+    cidr_blocks = ["${var.app_private_subnet_az_a_cidr}", "${var.app_private_subnet_az_b_cidr}"]
+  }
+
+
+  vpc_id = "${aws_vpc.test-vpc-for-final.id}"
+
+  tags = {
+    Name = "db_layer_security_group"
   }
 }

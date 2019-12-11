@@ -200,3 +200,70 @@ resource "aws_route_table_association" "us-west-2b-private-app" {
   route_table_id = "${aws_route_table.us-west-2a-private-app.id}"
 }
 
+/*
+  Private Subnet 1 for DB Tier
+*/
+resource "aws_subnet" "us-west-2a-private-db" {
+  vpc_id = "${aws_vpc.test-vpc-for-final.id}"
+
+  cidr_block        = "${var.db_private_subnet_az_a_cidr}"
+  availability_zone = "us-west-2a"
+
+  tags = {
+    Name = "Private Subnet for DB in AZ a"
+  }
+}
+
+resource "aws_route_table" "us-west-2a-private-db" {
+  vpc_id = "${aws_vpc.test-vpc-for-final.id}"
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = "${aws_nat_gateway.class-final-nat-gw.id}"
+  }
+
+  tags = {
+    Name = "db-private-1"
+  }
+}
+
+
+resource "aws_route_table_association" "us-west-2a-private-db" {
+  subnet_id      = "${aws_subnet.us-west-2a-private-db.id}"
+  route_table_id = "${aws_route_table.us-west-2a-private-db.id}"
+}
+
+/*
+  Private Subnet 2 for DB Tier
+*/
+resource "aws_subnet" "us-west-2b-private-db" {
+  vpc_id = "${aws_vpc.test-vpc-for-final.id}"
+
+  cidr_block        = "${var.db_private_subnet_az_b_cidr}"
+  availability_zone = "us-west-2b"
+
+  tags = {
+    Name = "Private Subnet for DB in AZ b"
+  }
+}
+
+resource "aws_route_table_association" "us-west-2b-private-db" {
+  subnet_id      = "${aws_subnet.us-west-2b-private-db.id}"
+  route_table_id = "${aws_route_table.us-west-2a-private-db.id}"
+}
+
+# Create a subnet group for the database
+resource "aws_db_subnet_group" "rds-private-subnet" {
+  name       = "rds-private-subnet-group"
+  subnet_ids = ["${aws_subnet.us-west-2b-private-db.id}", "${aws_subnet.us-west-2a-private-db.id}"]
+}
+
+
+########################
+# Helpers
+########################
+
+resource "aws_vpc_endpoint" "s3endpoint" {
+  vpc_id          = "${aws_vpc.test-vpc-for-final.id}"
+  service_name    = "com.amazonaws.${var.aws_region}.s3"
+  route_table_ids = ["${aws_route_table.us-west-2a-public.id}"]
+}
