@@ -10,8 +10,8 @@ resource "aws_launch_template" "web_tier" {
 }
 
 resource "aws_autoscaling_group" "web_auto_scaling" {
-  desired_capacity          = 4
-  max_size                  = 6
+  desired_capacity          = 6
+  max_size                  = 10
   min_size                  = 2
   health_check_grace_period = 300
   health_check_type         = "EC2"

@@ -10,9 +10,9 @@ resource "aws_launch_template" "app_tier" {
 }
 
 resource "aws_autoscaling_group" "app_auto_scaling" {
-  desired_capacity          = 4
-  max_size                  = 6
-  min_size                  = 2
+  desired_capacity          = 5
+  max_size                  = 10
+  min_size                  = 3
   health_check_grace_period = 300
   health_check_type         = "EC2"
   force_delete              = true

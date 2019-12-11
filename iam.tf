@@ -95,17 +95,27 @@ resource "aws_iam_user" "admin_user_1" {
   name = "admin_user"
 }
 
+resource "aws_iam_user" "admin_user_2" {
+  name = "admin_user_2"
+}
+
 # Add user to group
 
 resource "aws_iam_group_membership" "sysAdmins" {
   name = "sysAdmin-group-membership"
 
   users = [
-    "${aws_iam_user.admin_user_1.name}"
+    "${aws_iam_user.admin_user_1.name}",
+    "${aws_iam_user.admin_user_2.name}"
   ]
 
   group = "${aws_iam_group.sysAdminGroup.name}"
 }
+
+
+#############################
+# Universal account policy
+#############################
 
 
 resource "aws_iam_account_password_policy" "password_policy" {
